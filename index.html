@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NeuralLens · Multi-Modal AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=DM+Mono:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ══════════════════════════════════════
+   THEME TOKENS — dark (default)
+══════════════════════════════════════ */
+:root,
+[data-theme="dark"] {
+  --bg:       #07080c;
+  --s1:       #0f1117;
+  --s2:       #161923;
+  --s3:       #1e2433;
+  --border:   rgba(255,255,255,0.07);
+  --border2:  rgba(255,255,255,0.13);
+  --text:     #e8edf5;
+  --muted:    #7a8799;
+  --dim:      #3d4a5c;
+  --hero-bg:  linear-gradient(135deg,#0a1420 0%,#07080c 60%);
+  --shadow:   rgba(0,0,0,0.5);
+  --card-bg:  var(--s1);
+  --right-bg: var(--bg);
+  --upload-bg:rgba(255,255,255,0.015);
+  --upload-hover-bg: rgba(255,255,255,0.03);
+  --upload-hover-border: rgba(255,255,255,0.25);
+  --toggle-bg: #1e2433;
+  --toggle-border: rgba(255,255,255,0.13);
+  --toggle-knob: #3dffa0;
+  --toggle-icon-off: '🌙';
+  --price-placeholder: #3d4a5c;
+
+  --g:  #3dffa0;
+  --r:  #ff5f5f;
+  --p:  #8b78ff;
+  --a:  #ffb830;
+  --b:  #3db8ff;
+
+  --font: 'Syne', sans-serif;
+  --mono: 'DM Mono', monospace;
+  --rad: 18px;
+}
+
+/* ══════════════════════════════════════
+   THEME TOKENS — light
+══════════════════════════════════════ */
+[data-theme="light"] {
+  --bg:       #f0f2f7;
+  --s1:       #ffffff;
+  --s2:       #f5f7fc;
+  --s3:       #e8ecf4;
+  --border:   rgba(0,0,0,0.07);
+  --border2:  rgba(0,0,0,0.12);
+  --text:     #111827;
+  --muted:    #6b7a93;
+  --dim:      #9ba8bc;
+  --hero-bg:  linear-gradient(135deg,#e8f4ff 0%,#f0f2f7 60%);
+  --shadow:   rgba(0,0,0,0.1);
+  --card-bg:  #ffffff;
+  --right-bg: #f8faff;
+  --upload-bg:rgba(0,0,0,0.02);
+  --upload-hover-bg: rgba(61,255,160,0.04);
+  --upload-hover-border: rgba(61,200,120,0.5);
+  --toggle-bg: #e2e8f0;
+  --toggle-border: rgba(0,0,0,0.1);
+  --toggle-knob: #f59e0b;
+
+  --g:  #16a34a;
+  --r:  #dc2626;
+  --p:  #7c3aed;
+  --a:  #d97706;
+  --b:  #0284c7;
+}
+
+/* ══════════════════════════════════════
+   BASE
+══════════════════════════════════════ */
+html, body {
+  background: var(--bg);
+  font-family: var(--font);
+  color: var(--text);
+  height: 100%;
+  overflow: hidden;
+  transition: background 0.35s ease, color 0.35s ease;
+}
+
+/* ══════════════════════════════════════
+   THEME TOGGLE BUTTON
+══════════════════════════════════════ */
+.theme-toggle {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--toggle-bg);
+  border: 1px solid var(--toggle-border);
+  border-radius: 99px;
+  padding: 5px 14px 5px 8px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  flex-shrink: 0;
+  user-select: none;
+}
+.theme-toggle:hover {
+  border-color: var(--border2);
+  transform: scale(1.03);
+}
+.theme-toggle:active { transform: scale(0.97); }
+
+.toggle-track {
+  width: 36px; height: 20px;
+  background: var(--s3);
+  border-radius: 99px;
+  border: 1px solid var(--border2);
+  position: relative;
+  transition: background 0.3s;
+  flex-shrink: 0;
+}
+[data-theme="light"] .toggle-track { background: #fde68a; }
+
+.toggle-knob {
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--muted);
+  transition: transform 0.3s cubic-bezier(0.4,0,0.2,1), background 0.3s;
+}
+[data-theme="light"] .toggle-knob {
+  transform: translateX(16px);
+  background: #f59e0b;
+}
+
+.toggle-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.5px;
+  transition: color 0.25s;
+  white-space: nowrap;
+}
+
+/* Sun/moon icon */
+.toggle-icon {
+  font-size: 14px;
+  transition: transform 0.4s ease;
+}
+[data-theme="light"] .toggle-icon { transform: rotate(180deg); }
+
+/* ══════════════════════════════════════
+   HERO
+══════════════════════════════════════ */
+.hero {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 36px;
+  background: var(--hero-bg);
+  border-bottom: 1px solid var(--border2);
+  position: relative; overflow: hidden; z-index: 10;
+  transition: background 0.35s ease, border-color 0.35s ease;
+}
+.hero::before {
+  content:''; position:absolute; top:-50px; left:-50px;
+  width:240px; height:240px;
+  background:radial-gradient(circle, rgba(61,255,160,0.08) 0%, transparent 70%);
+  pointer-events:none;
+}
+[data-theme="light"] .hero::before {
+  background: radial-gradient(circle, rgba(16,163,74,0.06) 0%, transparent 70%);
+}
+.hero-left { display:flex; align-items:center; gap:14px; z-index:1; }
+.hero-logo {
+  width:42px; height:42px; border-radius:11px;
+  background:linear-gradient(135deg,#3dffa0,#00c97a);
+  display:flex; align-items:center; justify-content:center;
+  font-size:19px; box-shadow:0 0 22px rgba(61,255,160,0.3);
+  flex-shrink: 0;
+}
+[data-theme="light"] .hero-logo { box-shadow: 0 4px 16px rgba(16,163,74,0.25); }
+.hero-name { font-size:22px; font-weight:800; letter-spacing:-0.8px; }
+.hero-sub  { font-family:var(--mono); font-size:10px; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; margin-top:3px; }
+
+.hero-right {
+  display:flex; align-items:center; gap:8px; z-index:1;
+  flex-wrap:wrap; justify-content:flex-end;
+}
+.pill {
+  padding:4px 12px; border-radius:99px;
+  font-family:var(--mono); font-size:10px;
+  border:1px solid var(--border2); color:var(--muted);
+  display:flex; align-items:center; gap:6px;
+  transition: border-color 0.3s, color 0.3s;
+}
+.pill-live { border-color:rgba(61,255,160,0.4); color:var(--g); }
+[data-theme="light"] .pill-live { border-color:rgba(22,163,74,0.5); }
+.dot-pulse {
+  width:6px; height:6px; border-radius:50%; background:var(--g);
+  animation:pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.3;transform:scale(0.7)} }
+
+/* ══════════════════════════════════════
+   METRICS
+══════════════════════════════════════ */
+.metrics {
+  display:flex; background:var(--border); border-bottom:1px solid var(--border);
+  transition: background 0.35s;
+}
+.metric-cell {
+  flex:1; background:var(--s1); padding:11px 22px;
+  transition: background 0.35s;
+}
+.metric-val   { font-size:20px; font-weight:800; line-height:1; }
+.metric-label { font-family:var(--mono); font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-top:2px; }
+.metric-dot   { font-family:var(--mono); font-size:9px; margin-top:2px; }
+
+/* ══════════════════════════════════════
+   CAROUSEL SHELL
+══════════════════════════════════════ */
+.carousel-shell {
+  display: flex; flex-direction: column;
+  height: calc(100vh - 125px);
+  position: relative;
+}
+
+.tab-nav {
+  display: flex; gap: 0;
+  background: var(--s1);
+  border-bottom: 1px solid var(--border2);
+  padding: 0 36px;
+  overflow-x: auto; scrollbar-width: none;
+  transition: background 0.35s, border-color 0.35s;
+}
+.tab-nav::-webkit-scrollbar { display: none; }
+
+.tab-btn {
+  display: flex; align-items: center; gap: 8px;
+  padding: 13px 20px;
+  font-family: var(--font); font-size: 13px; font-weight: 600;
+  color: var(--dim);
+  background: none; border: none; border-bottom: 2px solid transparent;
+  cursor: pointer; white-space: nowrap;
+  transition: color 0.2s, border-color 0.2s;
+  position: relative; bottom: -1px;
+}
+.tab-btn:hover { color: var(--muted); }
+.tab-btn.active-g { border-color: var(--g); color: var(--g); }
+.tab-btn.active-r { border-color: var(--r); color: var(--r); }
+.tab-btn.active-p { border-color: var(--p); color: var(--p); }
+.tab-btn.active-a { border-color: var(--a); color: var(--a); }
+.tab-btn.active-b { border-color: var(--b); color: var(--b); }
+.tab-icon { font-size: 15px; }
+.tab-num {
+  font-family: var(--mono); font-size: 9px;
+  padding: 2px 6px; border-radius: 99px;
+  background: var(--s2); border: 1px solid var(--border);
+  color: var(--dim);
+  transition: background 0.35s;
+}
+
+/* ══════════════════════════════════════
+   CAROUSEL VIEWPORT
+══════════════════════════════════════ */
+.carousel-viewport { flex: 1; overflow: hidden; position: relative; }
+
+.carousel-track {
+  display: flex; height: 100%;
+  transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+.slide {
+  flex: 0 0 100%; height: 100%;
+  overflow-y: auto; scrollbar-width: thin;
+  scrollbar-color: var(--s3) transparent;
+  display: flex;
+}
+.slide::-webkit-scrollbar { width: 5px; }
+.slide::-webkit-scrollbar-thumb { background: var(--s3); border-radius: 3px; }
+
+/* ══════════════════════════════════════
+   CARD — 2-column layout
+══════════════════════════════════════ */
+.card-full {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  min-height: 100%;
+  position: relative;
+  background: var(--card-bg);
+  transition: background 0.35s;
+}
+
+/* Left panel */
+.card-left {
+  padding: 40px 36px;
+  border-right: 1px solid var(--border2);
+  display: flex; flex-direction: column;
+  position: relative; overflow: hidden;
+  transition: border-color 0.35s;
+}
+.left-glow { position: absolute; inset: 0; pointer-events: none; }
+.left-glow-g { background: radial-gradient(ellipse at 20% 20%, rgba(61,255,160,0.09) 0%, transparent 60%); }
+.left-glow-r { background: radial-gradient(ellipse at 20% 20%, rgba(255,95,95,0.09) 0%, transparent 60%); }
+.left-glow-p { background: radial-gradient(ellipse at 20% 20%, rgba(139,120,255,0.09) 0%, transparent 60%); }
+.left-glow-a { background: radial-gradient(ellipse at 20% 20%, rgba(255,184,48,0.09) 0%, transparent 60%); }
+.left-glow-b { background: radial-gradient(ellipse at 20% 20%, rgba(61,184,255,0.09) 0%, transparent 60%); }
+[data-theme="light"] .left-glow-g { background: radial-gradient(ellipse at 20% 20%, rgba(16,163,74,0.07) 0%, transparent 60%); }
+[data-theme="light"] .left-glow-r { background: radial-gradient(ellipse at 20% 20%, rgba(220,38,38,0.07) 0%, transparent 60%); }
+[data-theme="light"] .left-glow-p { background: radial-gradient(ellipse at 20% 20%, rgba(124,58,237,0.07) 0%, transparent 60%); }
+[data-theme="light"] .left-glow-a { background: radial-gradient(ellipse at 20% 20%, rgba(217,119,6,0.07) 0%, transparent 60%); }
+[data-theme="light"] .left-glow-b { background: radial-gradient(ellipse at 20% 20%, rgba(2,132,199,0.07) 0%, transparent 60%); }
+
+.model-num {
+  font-family: var(--mono); font-size: 11px;
+  color: var(--dim); letter-spacing: 2px; text-transform: uppercase;
+  margin-bottom: 24px;
+}
+.model-icon-big {
+  width: 68px; height: 68px; border-radius: 18px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 30px; margin-bottom: 18px;
+}
+.mib-g { background: rgba(61,255,160,0.12); border: 1px solid rgba(61,255,160,0.3); box-shadow: 0 0 30px rgba(61,255,160,0.12); }
+.mib-r { background: rgba(255,95,95,0.12);  border: 1px solid rgba(255,95,95,0.3);  box-shadow: 0 0 30px rgba(255,95,95,0.12); }
+.mib-p { background: rgba(139,120,255,0.12);border: 1px solid rgba(139,120,255,0.3); box-shadow: 0 0 30px rgba(139,120,255,0.12); }
+.mib-a { background: rgba(255,184,48,0.12); border: 1px solid rgba(255,184,48,0.3);  box-shadow: 0 0 30px rgba(255,184,48,0.12); }
+.mib-b { background: rgba(61,184,255,0.12); border: 1px solid rgba(61,184,255,0.3);  box-shadow: 0 0 30px rgba(61,184,255,0.12); }
+[data-theme="light"] .mib-g { background: rgba(16,163,74,0.1);  border-color: rgba(16,163,74,0.3);  }
+[data-theme="light"] .mib-r { background: rgba(220,38,38,0.1);  border-color: rgba(220,38,38,0.3);  }
+[data-theme="light"] .mib-p { background: rgba(124,58,237,0.1); border-color: rgba(124,58,237,0.3); }
+[data-theme="light"] .mib-a { background: rgba(217,119,6,0.1);  border-color: rgba(217,119,6,0.3);  }
+[data-theme="light"] .mib-b { background: rgba(2,132,199,0.1);  border-color: rgba(2,132,199,0.3);  }
+
+.model-title { font-size: 21px; font-weight: 800; line-height: 1.2; margin-bottom: 8px; }
+.model-desc  { font-family: var(--mono); font-size: 11px; color: var(--muted); line-height: 1.7; margin-bottom: 24px; }
+.model-tags  { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: auto; }
+.mtag {
+  padding: 4px 11px; border-radius: 99px;
+  font-family: var(--mono); font-size: 10px;
+  background: var(--s2); border: 1px solid var(--border2); color: var(--muted);
+  transition: background 0.35s, border-color 0.35s;
+}
+
+.model-status {
+  margin-top: 28px; padding: 13px 16px;
+  background: var(--s2); border: 1px solid var(--border);
+  border-radius: 12px;
+  transition: background 0.35s, border-color 0.35s;
+}
+.status-row { display: flex; justify-content: space-between; align-items: center; }
+.status-label { font-family: var(--mono); font-size: 10px; color: var(--dim); text-transform: uppercase; letter-spacing: 1px; }
+.status-dot   { display: flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 10px; }
+
+/* Right panel */
+.card-right {
+  padding: 40px 44px;
+  display: flex; flex-direction: column; gap: 18px;
+  background: var(--right-bg);
+  transition: background 0.35s;
+}
+
+.input-label {
+  font-family: var(--mono); font-size: 10px;
+  color: var(--dim); text-transform: uppercase; letter-spacing: 2px;
+  margin-bottom: 9px;
+}
+
+/* Upload zone */
+.upload-zone {
+  border: 1.5px dashed var(--border2);
+  border-radius: 12px; padding: 28px;
+  text-align: center; cursor: pointer;
+  background: var(--upload-bg);
+  transition: all 0.2s;
+}
+.upload-zone:hover {
+  border-color: var(--upload-hover-border);
+  background: var(--upload-hover-bg);
+}
+.uz-icon  { font-size: 26px; margin-bottom: 9px; }
+.uz-main  { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.uz-hint  { font-family: var(--mono); font-size: 10px; color: var(--dim); margin-top: 4px; }
+
+/* Buttons */
+.run-btn {
+  padding: 13px 24px; border-radius: 12px;
+  font-family: var(--font); font-size: 14px; font-weight: 700;
+  border: none; cursor: pointer; width: 100%;
+  transition: transform 0.15s, filter 0.15s, box-shadow 0.15s;
+}
+.run-btn:hover { transform: translateY(-2px); filter: brightness(1.07); }
+.run-btn:active { transform: scale(0.98); }
+.btn-g { background: linear-gradient(135deg,#3dffa0,#00c97a); color:#07080c; box-shadow:0 4px 18px rgba(61,255,160,0.25); }
+.btn-r { background: linear-gradient(135deg,#ff5f5f,#cc2020); color:#fff;    box-shadow:0 4px 18px rgba(255,95,95,0.25); }
+.btn-p { background: linear-gradient(135deg,#8b78ff,#6354cc); color:#fff;    box-shadow:0 4px 18px rgba(139,120,255,0.25); }
+.btn-a { background: linear-gradient(135deg,#ffb830,#cc8c00); color:#07080c; box-shadow:0 4px 18px rgba(255,184,48,0.25); }
+.btn-b { background: linear-gradient(135deg,#3db8ff,#007acc); color:#fff;    box-shadow:0 4px 18px rgba(61,184,255,0.25); }
+[data-theme="light"] .btn-g { color: #052e16; }
+[data-theme="light"] .btn-a { color: #451a03; }
+
+/* Result area */
+.result-area { animation: fadeUp 0.35s ease; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+
+.result-card {
+  padding: 18px 20px; border-radius: 13px;
+  display: flex; align-items: flex-start; gap: 14px;
+  margin-bottom: 12px;
+}
+.rc-g { background:rgba(61,255,160,0.08);  border:1px solid rgba(61,255,160,0.22); }
+.rc-r { background:rgba(255,95,95,0.08);   border:1px solid rgba(255,95,95,0.22); }
+.rc-p { background:rgba(139,120,255,0.08); border:1px solid rgba(139,120,255,0.22); }
+.rc-a { background:rgba(255,184,48,0.08);  border:1px solid rgba(255,184,48,0.22); }
+.rc-b { background:rgba(61,184,255,0.08);  border:1px solid rgba(61,184,255,0.22); }
+[data-theme="light"] .rc-g { background:rgba(16,163,74,0.07);  border-color:rgba(16,163,74,0.25); }
+[data-theme="light"] .rc-r { background:rgba(220,38,38,0.07);  border-color:rgba(220,38,38,0.25); }
+[data-theme="light"] .rc-p { background:rgba(124,58,237,0.07); border-color:rgba(124,58,237,0.25); }
+[data-theme="light"] .rc-a { background:rgba(217,119,6,0.07);  border-color:rgba(217,119,6,0.25); }
+[data-theme="light"] .rc-b { background:rgba(2,132,199,0.07);  border-color:rgba(2,132,199,0.25); }
+
+.rc-icon  { font-size: 24px; }
+.rc-label { font-family:var(--mono); font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; }
+.rc-value { font-size:19px; font-weight:800; margin-top:3px; }
+.rv-g { color: var(--g); } .rv-r { color: var(--r); } .rv-p { color: var(--p); }
+.rv-a { color: var(--a); } .rv-b { color: var(--b); }
+
+/* Confidence bar */
+.conf-row   { display:flex; justify-content:space-between; margin-bottom:5px; }
+.conf-name  { font-family:var(--mono); font-size:11px; color:var(--muted); }
+.conf-pct   { font-family:var(--mono); font-size:11px; color:var(--text); font-weight:700; }
+.conf-track { height:5px; background:var(--s3); border-radius:99px; overflow:hidden; margin-bottom:12px; transition: background 0.35s; }
+.conf-fill  { height:100%; border-radius:99px; transition: width 0.6s cubic-bezier(0.4,0,0.2,1); }
+.cf-g { background:linear-gradient(90deg,#3dffa0,#00e87a); }
+.cf-r { background:linear-gradient(90deg,#ff5f5f,#ff3030); }
+.cf-p { background:linear-gradient(90deg,#8b78ff,#b3a9ff); }
+.cf-a { background:linear-gradient(90deg,#ffb830,#ffce72); }
+.cf-b { background:linear-gradient(90deg,#3db8ff,#80d8ff); }
+
+/* Lang pills */
+.lang-cloud { display:flex; flex-wrap:wrap; gap:7px; }
+.lang-pill {
+  padding:4px 12px; border-radius:99px;
+  font-family:var(--mono); font-size:10px;
+  background:var(--s2); border:1px solid var(--border2); color:var(--muted);
+  transition:all 0.15s;
+}
+.lang-pill:hover { border-color:rgba(139,120,255,0.5); color:var(--p); }
+
+/* Player select */
+.styled-select {
+  width:100%; padding:12px 15px;
+  background:var(--s2); border:1px solid var(--border2);
+  border-radius:11px; color:var(--text);
+  font-family:var(--font); font-size:14px; font-weight:600;
+  appearance:none; cursor:pointer; outline:none;
+  transition: background 0.35s, border-color 0.2s, color 0.35s;
+}
+.styled-select:focus { border-color: rgba(255,184,48,0.5); }
+[data-theme="light"] .styled-select option { background: #fff; }
+
+.player-banner {
+  display:flex; align-items:center; gap:14px;
+  padding:13px 16px;
+  background:rgba(255,184,48,0.07);
+  border:1px solid rgba(255,184,48,0.22);
+  border-radius:11px;
+}
+[data-theme="light"] .player-banner { background:rgba(217,119,6,0.06); border-color:rgba(217,119,6,0.22); }
+.player-banner-icon { font-size:22px; }
+.pb-name  { font-size:14px; font-weight:700; color:var(--a); }
+.pb-stats { font-family:var(--mono); font-size:10px; color:var(--muted); margin-top:2px; }
+
+/* Similarity rows */
+.sim-list { display:flex; flex-direction:column; gap:7px; }
+.sim-row {
+  display:flex; align-items:center; gap:11px;
+  padding:11px 14px; border-radius:10px;
+  background:var(--s2); border:1px solid var(--border);
+  animation:fadeUp 0.3s ease;
+  transition: background 0.35s, border-color 0.35s;
+}
+.sim-rank  { font-family:var(--mono); font-size:11px; color:var(--dim); width:22px; }
+.sim-name  { flex:1; font-size:14px; font-weight:600; }
+.sim-bar-w { width:80px; height:4px; background:var(--s3); border-radius:99px; overflow:hidden; flex-shrink:0; transition: background 0.35s; }
+.sim-bar-f { height:100%; border-radius:99px; background:linear-gradient(90deg,var(--p),#b3a9ff); }
+.sim-pct   { font-family:var(--mono); font-size:12px; color:var(--p); font-weight:700; min-width:44px; text-align:right; }
+
+/* Price input */
+.price-big {
+  display:flex; align-items:center; gap:10px;
+  padding:14px 18px;
+  background:var(--s2); border:1px solid var(--border2);
+  border-radius:11px;
+  transition: background 0.35s, border-color 0.35s;
+}
+.price-symbol { font-size:26px; font-weight:800; color:var(--dim); }
+.price-input  {
+  flex:1; background:none; border:none; outline:none;
+  font-family:var(--font); font-size:30px; font-weight:800; color:var(--text);
+  transition: color 0.35s;
+}
+
+.presets { display:flex; gap:7px; flex-wrap:wrap; }
+.preset-btn {
+  padding:6px 14px; border-radius:99px;
+  font-family:var(--mono); font-size:11px;
+  background:var(--s2); border:1px solid var(--border2);
+  color:var(--muted); cursor:pointer; transition:all 0.15s;
+}
+.preset-btn:hover { border-color:rgba(61,184,255,0.5); color:var(--b); }
+
+/* Preview image */
+.img-preview {
+  width:100%; border-radius:11px; max-height:170px;
+  object-fit:cover; border:1px solid var(--border2);
+}
+.audio-player { width:100%; height:38px; border-radius:8px; accent-color:var(--p); }
+
+/* ══════════════════════════════════════
+   BOTTOM CONTROLS
+══════════════════════════════════════ */
+.carousel-controls {
+  display: flex; align-items: center; justify-content: center;
+  gap: 14px; padding: 12px 36px;
+  background: var(--s1); border-top: 1px solid var(--border);
+  transition: background 0.35s, border-color 0.35s;
+}
+.nav-btn {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: var(--s2); border: 1px solid var(--border2);
+  color: var(--text); font-size: 15px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.nav-btn:hover:not(:disabled) { background:var(--s3); border-color:var(--border2); transform:scale(1.08); }
+.nav-btn:disabled { opacity:0.25; cursor:not-allowed; }
+
+.dots { display:flex; gap:7px; align-items:center; }
+.dot {
+  height:8px; width:8px; border-radius:99px;
+  background:var(--s3); border:1px solid var(--border2);
+  cursor:pointer; transition:all 0.3s;
+}
+.dot.active-g { width:30px; background:var(--g); border-color:var(--g); }
+.dot.active-r { width:30px; background:var(--r); border-color:var(--r); }
+.dot.active-p { width:30px; background:var(--p); border-color:var(--p); }
+.dot.active-a { width:30px; background:var(--a); border-color:var(--a); }
+.dot.active-b { width:30px; background:var(--b); border-color:var(--b); }
+
+.slide-label {
+  font-family:var(--mono); font-size:11px; color:var(--dim);
+  min-width:130px; text-align:center;
+}
+
+/* Global transition for theme switch */
+*, *::before, *::after {
+  transition-property: background-color, border-color, color;
+  transition-duration: 0.3s;
+  transition-timing-function: ease;
+}
+/* Disable transition on transforms (carousel) */
+.carousel-track { transition: transform 0.55s cubic-bezier(0.4,0,0.2,1) !important; }
+.run-btn { transition: transform 0.15s, filter 0.15s, box-shadow 0.15s !important; }
+.nav-btn { transition: all 0.2s !important; }
+.theme-toggle { transition: all 0.25s ease !important; }
+.toggle-knob  { transition: transform 0.3s cubic-bezier(0.4,0,0.2,1), background 0.3s !important; }
+.conf-fill    { transition: width 0.6s cubic-bezier(0.4,0,0.2,1) !important; }
+.dot          { transition: all 0.3s !important; }
+</style>
+</head>
+<body>
+
+<!-- ═══ HERO ═══ -->
+<div class="hero">
+  <div class="hero-left">
+    <div class="hero-logo">🧠</div>
+    <div>
+      <div class="hero-name">NeuralLens</div>
+      <div class="hero-sub">Multi-Modal AI Dashboard · v2.0</div>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="pill pill-live"><span class="dot-pulse"></span> 5 Models Active</div>
+    <div class="pill">☕ Image</div>
+    <div class="pill">🚦 Video</div>
+    <div class="pill">🎤 Audio</div>
+    <div class="pill">⚽ FIFA</div>
+    <div class="pill">🛒 E-Com</div>
+
+    <!-- ── THEME TOGGLE ── -->
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark mode">
+      <span class="toggle-icon" id="toggleIcon">🌙</span>
+      <div class="toggle-track">
+        <div class="toggle-knob" id="toggleKnob"></div>
+      </div>
+      <span class="toggle-label" id="toggleLabel">Dark</span>
+    </button>
+  </div>
+</div>
+
+<!-- ═══ METRICS ═══ -->
+<div class="metrics">
+  <div class="metric-cell">
+    <div class="metric-val" style="color:var(--g)">5</div>
+    <div class="metric-label">Models Loaded</div>
+    <div class="metric-dot" style="color:var(--g)">● All healthy</div>
+  </div>
+  <div class="metric-cell">
+    <div class="metric-val" style="color:var(--p)">10</div>
+    <div class="metric-label">Languages</div>
+    <div class="metric-dot" style="color:var(--p)">● Indian scripts</div>
+  </div>
+  <div class="metric-cell">
+    <div class="metric-val" style="color:var(--a)">4</div>
+    <div class="metric-label">Modalities</div>
+    <div class="metric-dot" style="color:var(--a)">● Ensemble ready</div>
+  </div>
+  <div class="metric-cell">
+    <div class="metric-val" style="color:var(--r)">RT</div>
+    <div class="metric-label">Processing</div>
+    <div class="metric-dot" style="color:var(--r)">● Real-time</div>
+  </div>
+  <div class="metric-cell">
+    <div class="metric-val" style="color:var(--b)">HOG</div>
+    <div class="metric-label">Feature Method</div>
+    <div class="metric-dot" style="color:var(--b)">● + Mel Spectro</div>
+  </div>
+</div>
+
+<!-- ═══ CAROUSEL SHELL ═══ -->
+<div class="carousel-shell">
+
+  <!-- TAB NAV -->
+   
+  <div class="tab-nav" id="tabNav">
+    <button class="tab-btn" data-slide="0" onclick="goSlide(0)">
+      <span class="tab-icon">🚦</span> Traffic Detection <span class="tab-num">02</span>
+    </button>
+    <button class="tab-btn" data-slide="1" onclick="goSlide(1)">
+      <span class="tab-icon">🎤</span> Language ID <span class="tab-num">03</span>
+    </button>
+    <button class="tab-btn active-g" data-slide="2" onclick="goSlide(2)">
+      <span class="tab-icon">☕</span> Coffee Beans <span class="tab-num">01</span>
+    </button>
+    <button class="tab-btn" data-slide="3" onclick="goSlide(3)">
+      <span class="tab-icon">⚽</span> FIFA Recommender <span class="tab-num">04</span>
+    </button>
+    <button class="tab-btn" data-slide="4" onclick="goSlide(4)">
+      <span class="tab-icon">🛒</span> E-Commerce <span class="tab-num">05</span>
+    </button>
+  </div>
+
+  <!-- VIEWPORT -->
+  <div class="carousel-viewport">
+    <div class="carousel-track" id="track">
+
+      <!-- ══ SLIDE 1: VIDEO ══ -->
+      <div class="slide">
+        <div class="card-full">
+
+            <!-- LEFT PANEL -->
+            <div class="card-left">
+            <div class="left-glow left-glow-r"></div>
+
+            <div class="model-num">Model 02 / 05 · Object Detection</div>
+            <div class="model-icon-big mib-r">🚦</div>
+
+            <div class="model-title">Traffic Signal Detection</div>
+
+            <!-- ✅ UPDATED DESCRIPTION -->
+            <div class="model-desc">
+                Upload a traffic video and run YOLOv8 to detect traffic signals, vehicles, and road objects.
+                The model processes frames and returns an annotated video with bounding boxes.
+            </div>
+
+            <div class="model-tags">
+                <span class="mtag">YOLOv8</span>
+                <span class="mtag">Video Inference</span>
+                <span class="mtag">Bounding Boxes</span>
+                <span class="mtag">Real Output</span>
+                <span class="mtag">OpenCV</span>
+            </div>
+
+            <div class="model-status">
+                <div class="status-row">
+                <span class="status-label">Model Status</span>
+                <span class="status-dot">
+                    <span class="dot-pulse" style="background:var(--r)"></span> Ready
+                </span>
+                </div>
+
+                <div class="status-row" style="margin-top:7px">
+                <span class="status-label">Input Format</span>
+                <span style="font-family:var(--mono);font-size:10px;color:var(--r)">
+                    MP4 Video · Backend Processing
+                </span>
+                </div>
+            </div>
+            </div>
+
+            <!-- RIGHT PANEL -->
+            <div class="card-right">
+
+            <!-- UPLOAD -->
+            <div>
+                <div class="input-label">Upload Traffic Video</div>
+
+                <div class="upload-zone" onclick="document.getElementById('vidInput').click()">
+                <div class="uz-icon">🎬</div>
+                <div class="uz-main" id="vidMain">Drop an MP4 video here</div>
+                <div class="uz-hint">Short clips (5–15 sec) recommended</div>
+
+                <input type="file" id="vidInput" accept="video/mp4"
+                        style="display:none" onchange="handleVid(event)">
+                </div>
+            </div>
+
+            <!-- BUTTON -->
+            <button class="run-btn btn-r" onclick="runVideo()">
+                ▶ Run Detection
+            </button>
+
+            <!-- RESULT -->
+            <div id="videoOut" style="display:none" class="result-area">
+
+                <!-- STATUS -->
+                <div class="result-card rc-r">
+                <div class="rc-icon">🎯</div>
+                <div>
+                    <div class="rc-label">Detection Status</div>
+                    <div class="rc-value rv-r" id="vidStatus">Processing...</div>
+                </div>
+                </div>
+
+                <!-- OBJECT COUNT -->
+                <div class="conf-row">
+                <span class="conf-name">Objects Detected</span>
+                <span class="conf-pct" id="vidObjects">—</span>
+                </div>
+
+                <!-- 🎬 VIDEO PLAYER (NEW) -->
+                <video id="videoPlayer"
+                  controls
+                  autoplay
+                  muted
+                  playsinline
+                  style="width:100%; margin-top:12px; display:none;">
+                 </video>
+
+            </div>
+
+            </div>
+        </div>
+        </div>
+
+      <!-- ══ SLIDE 2: AUDIO ══ -->
+      <div class="slide">
+        <div class="card-full">
+          <div class="card-left">
+            <div class="left-glow left-glow-p"></div>
+            <div class="model-num">Model 03 / 05 · Audio Classification</div>
+            <div class="model-icon-big mib-p">🎤</div>
+            <div class="model-title">Indian Language Detection</div>
+            <div class="model-desc">Converts 5-second WAV/mpeg/mp3 clips to Mel Spectrograms (128 × 216) and classifies among 10 major Indian languages using a CNN trained on MFCC features.</div>
+            <div class="model-tags">
+              <span class="mtag">CNN</span><span class="mtag">Mel Spectrogram</span>
+              <span class="mtag">Librosa</span><span class="mtag">10 Languages</span><span class="mtag">MFCC</span>
+            </div>
+            <div class="model-status">
+              <div class="status-row">
+                <span class="status-label">Model Status</span>
+                <span class="status-dot"><span class="dot-pulse" style="background:var(--p)"></span> Ready</span>
+              </div>
+              <div class="status-row" style="margin-top:7px">
+                <span class="status-label">Sample Rate</span>
+                <span style="font-family:var(--mono);font-size:10px;color:var(--p)">22050 Hz · 5 sec</span>
+              </div>
+            </div>
+          </div>
+          <div class="card-right">
+            <div>
+              <div class="input-label">Supported Languages</div>
+              <div class="lang-cloud" style="margin-bottom:18px">
+                <span class="lang-pill">Hindi</span><span class="lang-pill">Tamil</span>
+                <span class="lang-pill">Telugu</span><span class="lang-pill">Kannada</span>
+                <span class="lang-pill">Malayalam</span><span class="lang-pill">Bengali</span>
+                <span class="lang-pill">Marathi</span><span class="lang-pill">Gujarati</span>
+                <span class="lang-pill">Punjabi</span><span class="lang-pill">Urdu</span>
+              </div>
+              <div class="input-label">Upload WAV/mp3/mpeg Audio</div>
+              <div class="upload-zone" onclick="document.getElementById('audioInput').click()">
+                <div class="uz-icon">🎵</div>
+                <div class="uz-main" id="audioMain">Drop a WAV/mp3/mpeg audio file here</div>
+                <div class="uz-hint">5-second clips give best results · 22050 Hz</div>
+                <input type="file" id="audioInput" accept=".wav,.mp3,.mpeg" style="display:none" onchange="handleAudio(event)">
+              </div>
+              <audio id="audioPlayer" class="audio-player" controls style="display:none;margin-top:12px"></audio>
+            </div>
+            <button class="run-btn btn-p" onclick="runAudio()">🎧 Detect Language</button>
+            <div id="audioOut" style="display:none" class="result-area">
+              <div class="result-card rc-p">
+                <div class="rc-icon">🗣️</div>
+                <div>
+                  <div class="rc-label">Detected Language</div>
+                  <div class="rc-value rv-p" id="audioLang">—</div>
+                </div>
+              </div>
+              <div class="conf-row"><span class="conf-name">Model Confidence</span><span class="conf-pct" id="audioConf">—</span></div>
+              <div class="conf-track"><div class="conf-fill cf-p" id="audioBar" style="width:0%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ SLIDE 3: COFFEE ══ -->
+      <div class="slide">
+        <div class="card-full">
+          <div class="card-left">
+            <div class="left-glow left-glow-g"></div>
+            <div class="model-num">Model 01 / 05 · Image Classification</div>
+            <div class="model-icon-big mib-g">☕</div>
+            <div class="model-title">Coffee Bean Classification</div>
+            <div class="model-desc">Four-model ensemble (SVM, KNN, Random Forest, CNN) extracts HOG features from bean images and votes on the final class label with majority consensus.</div>
+            <div class="model-tags">
+              <span class="mtag">SVM</span><span class="mtag">KNN</span><span class="mtag">Random Forest</span>
+              <span class="mtag">CNN</span><span class="mtag">HOG Features</span><span class="mtag">Ensemble Voting</span>
+            </div>
+            <div class="model-status">
+              <div class="status-row">
+                <span class="status-label">Model Status</span>
+                <span class="status-dot"><span class="dot-pulse"></span> Ready</span>
+              </div>
+              <div class="status-row" style="margin-top:7px">
+                <span class="status-label">Input Size</span>
+                <span style="font-family:var(--mono);font-size:10px;color:var(--g)">128 × 128 px</span>
+              </div>
+            </div>
+          </div>
+          <div class="card-right">
+            <div>
+              <div class="input-label">Upload Bean Image</div>
+              <div class="upload-zone" onclick="document.getElementById('imgInput').click()">
+                <div class="uz-icon" id="imgIcon">📸</div>
+                <div class="uz-main" id="imgMain">Drop a coffee bean image here</div>
+                <div class="uz-hint">JPG · PNG · Supports batch inference</div>
+                <input type="file" id="imgInput" accept="image/*" style="display:none" onchange="handleImg(event)">
+              </div>
+              <img id="imgPreview" class="img-preview" style="display:none;margin-top:12px" />
+            </div>
+            <button class="run-btn btn-g" onclick="runCoffee()">🔍 Run Ensemble Classification</button>
+            <div id="coffeeOut" style="display:none" class="result-area">
+              <div class="result-card rc-g">
+                <div class="rc-icon">✅</div>
+                <div>
+                  <div class="rc-label">Predicted Bean Class</div>
+                  <div class="rc-value rv-g" id="coffeeClass">—</div>
+                </div>
+              </div>
+              <div class="conf-row"><span class="conf-name">Ensemble Confidence</span><span class="conf-pct" id="coffeeConf">—</span></div>
+              <div class="conf-track"><div class="conf-fill cf-g" id="coffeeBar" style="width:0%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ SLIDE 4: FIFA ══ -->
+     <div class="slide">
+        <div class="card-full">
+
+                <!-- LEFT PANEL -->
+                <div class="card-left">
+                    <div class="left-glow left-glow-a"></div>
+
+                    <div class="model-num">Model 04 / 05 · Recommender System</div>
+                    <div class="model-icon-big mib-a">⚽</div>
+
+                    <div class="model-title">FIFA Player Recommender</div>
+
+                    <!-- ✅ UPDATED DESCRIPTION -->
+                    <div class="model-desc">
+                        Uses real FIFA dataset features like overall rating, potential, age, height, goals, assists, and defensive stats.
+                        Applies StandardScaler and cosine similarity to recommend the top 5 most similar players dynamically.
+                    </div>
+
+                    <div class="model-tags">
+                        <span class="mtag">Cosine Similarity</span>
+                        <span class="mtag">StandardScaler</span>
+                        <span class="mtag">Multi-Feature Vector</span>
+                        <span class="mtag">Real Dataset</span>
+                        <span class="mtag">sklearn</span>
+                    </div>
+
+                    <div class="model-status">
+                        <div class="status-row">
+                            <span class="status-label">Model Status</span>
+                            <span class="status-dot">
+                                <span class="dot-pulse" style="background:var(--a)"></span> Ready
+                            </span>
+                        </div>
+
+                        <div class="status-row" style="margin-top:7px">
+                            <span class="status-label">Dataset</span>
+                            <span style="font-family:var(--mono);font-size:10px;color:var(--a)">
+                                players.pkl · Dynamic API
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT PANEL -->
+                <div class="card-right">
+
+                    <!-- PLAYER SELECT -->
+                    <div>
+                        <div class="input-label">Select a Player</div>
+
+                        <!-- ✅ EMPTY (will be filled dynamically) -->
+                        <select class="styled-select" id="playerSel" onchange="updatePlayerBanner()">
+                        <option value="">Loading players...</option>
+                        </select>
+                    </div>
+
+                    <!-- PLAYER INFO -->
+                    <div id="playerBanner" style="display:none" class="player-banner">
+                        <span class="player-banner-icon">⭐</span>
+                        <div>
+                            <div class="pb-name" id="pbName">—</div>
+                            <div class="pb-stats" id="pbStats">OVR — · POT —</div>
+                        </div>
+                    </div>
+
+                    <!-- BUTTON -->
+                    <button class="run-btn btn-a" onclick="runFIFA()">🔎 Find Similar Players</button>
+
+                    <!-- RESULTS -->
+                    <div id="fifaOut" style="display:none" class="result-area">
+                        <div class="sim-list" id="simList"></div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+      <!-- ══ SLIDE 5: E-COMMERCE ══ -->
+      <div class="slide">
+        <div class="card-full">
+          <div class="card-left">
+            <div class="left-glow left-glow-b"></div>
+            <div class="model-num">Model 05 / 05 · Text Classification</div>
+            <div class="model-icon-big mib-b">🛒</div>
+            <div class="model-title">E-Commerce Product Classifier</div>
+            <div class="model-desc">Logistic Regression and Naïve Bayes models classify products as Standard or Premium SKUs based on price-point features with high confidence outputs.</div>
+            <div class="model-tags">
+              <span class="mtag">Logistic Regression</span><span class="mtag">Naïve Bayes</span>
+              <span class="mtag">Price Inference</span><span class="mtag">SKU Classification</span>
+            </div>
+            <div class="model-status">
+              <div class="status-row">
+                <span class="status-label">Model Status</span>
+                <span class="status-dot"><span class="dot-pulse" style="background:var(--b)"></span> Ready</span>
+              </div>
+              <div class="status-row" style="margin-top:7px">
+                <span class="status-label">Threshold</span>
+                <span style="font-family:var(--mono);font-size:10px;color:var(--b)">$100 · Binary</span>
+              </div>
+            </div>
+          </div>
+          <div class="card-right">
+            <div>
+              <div class="input-label">Enter Product Price</div>
+              <div class="price-big">
+                <span class="price-symbol">$</span>
+                <input type="number" class="price-input" id="priceIn" value="50" min="0" max="100000" placeholder="0.00">
+              </div>
+            </div>
+            <div>
+              <div class="input-label">Quick Presets</div>
+              <div class="presets">
+                <button class="preset-btn" onclick="setPrice(10)">Budget · $10</button>
+                <button class="preset-btn" onclick="setPrice(75)">Mid · $75</button>
+                <button class="preset-btn" onclick="setPrice(200)">High · $200</button>
+                <button class="preset-btn" onclick="setPrice(750)">Luxury · $750</button>
+              </div>
+            </div>
+            <button class="run-btn btn-b" onclick="runEcom()">🏷️ Classify Product</button>
+            <div id="ecomOut" style="display:none" class="result-area">
+              <div class="result-card" id="ecomCard">
+                <div class="rc-icon" id="ecomIcon">📦</div>
+                <div style="flex:1">
+                  <div class="rc-label">Product Classification</div>
+                  <div class="rc-value" id="ecomClass" style="color:var(--b)">—</div>
+                </div>
+                <div style="text-align:right">
+                  <div class="rc-label">Price Point</div>
+                  <div style="font-family:var(--mono);font-size:15px;font-weight:700;color:var(--text)" id="ecomPriceLbl">—</div>
+                </div>
+              </div>
+              <div class="conf-row"><span class="conf-name">Price Tier Score</span><span class="conf-pct" id="ecomConf">—</span></div>
+              <div class="conf-track"><div class="conf-fill cf-b" id="ecomBar" style="width:0%"></div></div>
+              <div class="conf-row"><span class="conf-name">Model Confidence</span><span class="conf-pct">High</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /track -->
+  </div><!-- /viewport -->
+
+  <!-- BOTTOM CONTROLS -->
+  <div class="carousel-controls">
+    <button class="nav-btn" id="btnPrev" onclick="prevSlide()" disabled>←</button>
+    <div class="dots" id="dotsEl"></div>
+    <span class="slide-label" id="slideLbl">Coffee Beans · 1 / 5</span>
+    <button class="nav-btn" id="btnNext" onclick="nextSlide()">→</button>
+  </div>
+
+</div><!-- /carousel-shell -->
+
+<script>
+const API = "http://127.0.0.1:8000";
+/* ══════════════════════════════════════
+   THEME TOGGLE
+══════════════════════════════════════ */
+let isDark = true;
+
+function toggleTheme() {
+  isDark = !isDark;
+  const html  = document.documentElement;
+  const icon  = document.getElementById('toggleIcon');
+  const label = document.getElementById('toggleLabel');
+
+  html.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  icon.textContent  = isDark ? '🌙' : '☀️';
+  label.textContent = isDark ? 'Dark' : 'Light';
+}
+
+/* ══════════════════════════════════════
+   CAROUSEL
+══════════════════════════════════════ */
+const SLIDES = 5;
+const COLORS = ['g','r','p','a','b'];
+const NAMES  = ['Coffee Beans','Traffic Detection','Language ID','FIFA Recommender','E-Commerce'];
+let cur = 0;
+
+const track    = document.getElementById('track');
+const dotsEl   = document.getElementById('dotsEl');
+const btnPrev  = document.getElementById('btnPrev');
+const btnNext  = document.getElementById('btnNext');
+const slideLbl = document.getElementById('slideLbl');
+const tabs     = document.querySelectorAll('.tab-btn');
+
+// Build dots
+for (let i = 0; i < SLIDES; i++) {
+  const d = document.createElement('div');
+  d.className = 'dot';
+  d.onclick = () => goSlide(i);
+  dotsEl.appendChild(d);
+}
+
+function goSlide(n) {
+  cur = n;
+  track.style.transform = `translateX(-${cur * 100}%)`;
+  dotsEl.querySelectorAll('.dot').forEach((d, i) => {
+    d.className = 'dot' + (i === cur ? ` active-${COLORS[cur]}` : '');
+  });
+  tabs.forEach((t, i) => {
+    t.className = 'tab-btn' + (i === cur ? ` active-${COLORS[cur]}` : '');
+  });
+  slideLbl.textContent = `${NAMES[cur]} · ${cur+1} / ${SLIDES}`;
+  btnPrev.disabled = cur === 0;
+  btnNext.disabled = cur === SLIDES - 1;
+}
+
+function prevSlide() { if (cur > 0) goSlide(cur - 1); }
+function nextSlide() { if (cur < SLIDES - 1) goSlide(cur + 1); }
+
+window.addEventListener('keydown', e => {
+  if (e.key === 'ArrowLeft')  prevSlide();
+  if (e.key === 'ArrowRight') nextSlide();
+});
+
+let tx = 0;
+document.querySelector('.carousel-viewport').addEventListener('touchstart', e => tx = e.touches[0].clientX, {passive:true});
+document.querySelector('.carousel-viewport').addEventListener('touchend', e => {
+  const diff = tx - e.changedTouches[0].clientX;
+  if (Math.abs(diff) > 50) diff > 0 ? nextSlide() : prevSlide();
+}, {passive:true});
+
+goSlide(0);
+
+/* ══════════════════════════════════════
+   MODEL LOGIC
+══════════════════════════════════════ */
+// Coffee
+function handleImg(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const prev = document.getElementById('imgPreview');
+  prev.src = URL.createObjectURL(file); prev.style.display = 'block';
+  document.getElementById('imgIcon').textContent = '✅';
+  document.getElementById('imgMain').textContent = file.name;
+}
+async function runCoffee() {
+  const file = document.getElementById('imgInput').files[0];
+  if (!file) return alert("Upload image first");
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const res = await fetch(`${API}/predict/coffee`, {
+    method: "POST",
+    body: formData
+  });
+
+  const data = await res.json();
+
+  document.getElementById('coffeeClass').textContent = data.class;
+  document.getElementById('coffeeConf').textContent = (data.confidence * 100).toFixed(1) + '%';
+
+  document.getElementById('coffeeBar').style.width = (data.confidence * 100) + '%';
+
+  show('coffeeOut');
+}
+
+// Video
+function handleVid(e) {
+  const file = e.target.files[0]; if (!file) return;
+  document.getElementById('vidMain').textContent = '📹 ' + file.name;
+}
+async function runVideo() {
+  const file = document.getElementById("vidInput").files[0];
+
+  if (!file) {
+    alert("Upload video first");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  show("videoOut");
+
+  const player = document.getElementById("videoPlayer");
+  const status = document.getElementById("vidStatus");
+
+  status.textContent = "Processing... ⏳";
+  player.style.display = "none";
+
+  try {
+    const res = await fetch(`${API}/predict/traffic`, {
+      method: "POST",
+      body: formData
+    });
+
+    const data = await res.json();
+    console.log(data);
+
+    if (data.error) {
+      status.textContent = data.error;
+      return;
+    }
+
+    status.textContent = "Detection Complete ✓";
+
+    // 🔥 FINAL FIX (NO CACHE)
+    player.src = "http://127.0.0.1:8000/video";
+    player.load();
+
+    player.onloadeddata = () => {
+      player.play();
+    };
+
+    player.style.display = "block";
+
+  } catch (err) {
+    console.error(err);
+    status.textContent = "Error ❌";
+  }
+}
+
+// Audio
+function handleAudio(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const player = document.getElementById('audioPlayer');
+  player.src = URL.createObjectURL(file); player.style.display = 'block';
+  document.getElementById('audioMain').textContent = '🎵 ' + file.name;
+}
+async function runAudio() {
+  const file = document.getElementById('audioInput').files[0];
+  if (!file) return alert("Upload audio");
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const res = await fetch(`${API}/predict/audio`, {
+    method: "POST",
+    body: formData
+  });
+
+  const data = await res.json();
+
+  document.getElementById('audioLang').textContent = data.language;
+  document.getElementById('audioConf').textContent = (data.confidence * 100).toFixed(1) + '%';
+  document.getElementById('audioBar').style.width = (data.confidence * 100) + '%';
+
+  show('audioOut');
+}
+
+// FIFA
+
+async function updatePlayerBanner() {
+  const name = document.getElementById('playerSel').value;
+  const banner = document.getElementById('playerBanner');
+
+  if (!name) {
+    banner.style.display = 'none';
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API}/player/details?player_name=${name}`);
+    const data = await res.json();
+
+    if (data.error) {
+      banner.style.display = 'none';
+      return;
+    }
+
+    document.getElementById('pbName').textContent = data.name;
+    document.getElementById('pbStats').textContent =
+      `OVR ${data.overall} · POT ${data.potential}`;
+
+    banner.style.display = 'flex';
+
+  } catch (err) {
+    console.error(err);
+  }
+}
+async function runFIFA() {
+  const name = document.getElementById('playerSel').value;
+  if (!name) return alert("Select player");
+
+  const res = await fetch(`${API}/predict/fifa?player_name=${name}`);
+  const data = await res.json();
+
+  const list = document.getElementById('simList');
+  list.innerHTML = '';
+
+  data.players.forEach((p, i) => {
+    list.innerHTML += `
+      <div class="sim-row">
+        <span class="sim-rank">#${i+1}</span>
+        <span class="sim-name">${p.name}</span>
+        <div class="sim-bar-w">
+          <div class="sim-bar-f" style="width:${p.score * 100}%"></div>
+        </div>
+        <span class="sim-pct">${(p.score * 100).toFixed(1)}%</span>
+      </div>`;
+  });
+
+  show('fifaOut');
+}
+
+async function loadPlayers() {
+  try {
+    const res = await fetch(`${API}/players/list`);
+    const data = await res.json();
+
+    const select = document.getElementById("playerSel");
+    select.innerHTML = `<option value="">— Choose a player —</option>`;
+
+    data.players.forEach(name => {
+      select.innerHTML += `<option>${name}</option>`;
+    });
+
+  } catch (err) {
+    console.error("Failed to load players", err);
+  }
+}
+
+window.onload = function () {
+  loadPlayers();
+};
+// E-com
+function setPrice(v) { document.getElementById('priceIn').value = v; }
+async function runEcom() {
+  const price = document.getElementById('priceIn').value;
+
+  const res = await fetch(`${API}/predict/ecom?price=${price}`);
+  const data = await res.json();
+
+  document.getElementById('ecomClass').textContent = data.class;
+  document.getElementById('ecomConf').textContent = (data.score * 100).toFixed(1) + '%';
+  document.getElementById('ecomPriceLbl').textContent = "$" + price;
+
+  document.getElementById('ecomBar').style.width = (data.score * 100) + '%';
+
+  show('ecomOut');
+}
+
+// Util
+function show(id) {
+  const el = document.getElementById(id);
+  el.style.display = 'none';
+  requestAnimationFrame(() => { el.style.display = 'block'; });
+}
+</script>
+</body>
+</html>
