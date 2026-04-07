@@ -1,0 +1,17 @@
+fastapi
+uvicorn
+numpy
+opencv-python
+joblib
+librosa
+tensorflow
+scikit-image
+ultralytics
+Pillow
+scikit-learn
+imageio-ffmpeg
+joblib
+scikit-learn
+skimage
+ultralytics
+imageio_ffmpeg
