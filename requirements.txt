@@ -3,7 +3,7 @@ numpy
 pandas
 opencv-python
 scikit-learn
-tensorflow==2.15.0
+# tensorflow==2.15.0
 librosa
 joblib
 pillow
