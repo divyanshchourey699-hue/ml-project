@@ -2,6 +2,7 @@ import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 from fastapi import FastAPI, File, UploadFile
+from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 import numpy as np
 import cv2
@@ -30,6 +31,11 @@ app = FastAPI()
 if not os.path.exists("output"):
     os.makedirs("output")
 app.mount("/output", StaticFiles(directory="output"), name="output")
+
+@app.get("/", response_class=HTMLResponse)
+async def read_index():
+    with open("index.html", "r", encoding="utf-8") as f:
+        return f.read()
 
 # ---------------- CORS ----------------
 app.add_middleware(
@@ -344,7 +350,7 @@ async def predict_traffic(file: UploadFile = File(...)):
         time.sleep(1)
 
         return {
-            "video_url": "http://127.0.0.1:8000/video",
+            "video_url": "/video",
             "detections": total
         }
 

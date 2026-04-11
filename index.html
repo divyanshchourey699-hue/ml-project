@@ -1022,7 +1022,7 @@ html, body {
 </div><!-- /carousel-shell -->
 
 <script>
-const API = "http://127.0.0.1:8000";
+const API = "";
 /* ══════════════════════════════════════
    THEME TOGGLE
 ══════════════════════════════════════ */
@@ -1167,7 +1167,7 @@ async function runVideo() {
     status.textContent = "Detection Complete ✓";
 
     // 🔥 FINAL FIX (NO CACHE)
-    player.src = "http://127.0.0.1:8000/video";
+    player.src = data.video_url || "/video";
     player.load();
 
     player.onloadeddata = () => {
