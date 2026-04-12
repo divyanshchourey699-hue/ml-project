@@ -85,9 +85,16 @@ html, body {
   font-family: var(--font);
   color: var(--text);
   height: 100%;
-  overflow: hidden;
+  overflow-x: hidden;
   transition: background 0.35s ease, color 0.35s ease;
 }
+@media (max-width: 900px) {
+  html, body {
+    height: auto;
+    overflow-y: auto;
+  }
+}
+
 
 /* ══════════════════════════════════════
    THEME TOGGLE BUTTON
@@ -226,6 +233,13 @@ html, body {
   height: calc(100vh - 125px);
   position: relative;
 }
+@media (max-width: 900px) {
+  .carousel-shell {
+    height: auto;
+    min-height: calc(100vh - 160px);
+  }
+}
+
 
 .tab-nav {
   display: flex; gap: 0;
@@ -557,21 +571,86 @@ html, body {
   min-width:130px; text-align:center;
 }
 
-/* Global transition for theme switch */
-*, *::before, *::after {
-  transition-property: background-color, border-color, color;
-  transition-duration: 0.3s;
-  transition-timing-function: ease;
+/* ══════════════════════════════════════
+   MOBILE RESPONSIVENESS
+   ══════════════════════════════════════ */
+@media (max-width: 900px) {
+  .card-full {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+  .card-left {
+    padding: 32px 24px;
+    border-right: none;
+    border-bottom: 1px solid var(--border2);
+  }
+  .card-right {
+    padding: 32px 24px;
+  }
+  .slide {
+    height: auto;
+    overflow-y: visible;
+  }
 }
-/* Disable transition on transforms (carousel) */
-.carousel-track { transition: transform 0.55s cubic-bezier(0.4,0,0.2,1) !important; }
-.run-btn { transition: transform 0.15s, filter 0.15s, box-shadow 0.15s !important; }
-.nav-btn { transition: all 0.2s !important; }
-.theme-toggle { transition: all 0.25s ease !important; }
-.toggle-knob  { transition: transform 0.3s cubic-bezier(0.4,0,0.2,1), background 0.3s !important; }
-.conf-fill    { transition: width 0.6s cubic-bezier(0.4,0,0.2,1) !important; }
-.dot          { transition: all 0.3s !important; }
+
+@media (max-width: 768px) {
+  .hero {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 20px 24px;
+  }
+  .hero-right {
+    justify-content: flex-start;
+    width: 100%;
+    gap: 10px;
+  }
+  .metrics {
+    flex-wrap: wrap;
+  }
+  .metric-cell {
+    flex: 0 0 50%;
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .metric-cell:nth-child(odd) {
+    border-right: 1px solid var(--border);
+  }
+  .tab-nav {
+    padding: 0 20px;
+  }
+  .carousel-controls {
+    padding: 15px 24px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .slide-label {
+    order: -1;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 4px;
+  }
+  .dots {
+    order: 0;
+  }
+  #btnPrev { order: 1; }
+  #btnNext { order: 2; }
+}
+
+@media (max-width: 480px) {
+  .metric-cell {
+    flex: 0 0 100%;
+    border-right: none !important;
+  }
+  .hero-name { font-size: 19px; }
+  .hero-sub { font-size: 9px; }
+  .model-title { font-size: 19px; }
+  .model-icon-big { width: 56px; height: 56px; font-size: 24px; }
+  .run-btn { padding: 12px 16px; font-size: 13px; }
+  .rc-value { font-size: 17px; }
+}
 </style>
+
 </head>
 <body>
 
